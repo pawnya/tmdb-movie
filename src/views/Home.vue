@@ -1,9 +1,7 @@
 <template>
   <div class="wrapper">
       <Categories @filterFilm='getMovies' />
-      <h2 v-if="loading">
-        <p>Choose genre</p>
-      </h2>
+      <p v-if="loading">Loading...</p>
       <ul v-else-if="movies.length > 0" class="movie-card-grid">
         <movie-card v-for="movie in movies" :key="movie.id" :movie="movie" />
       </ul>
@@ -15,28 +13,49 @@
 
 <script>
 // @ is an alias to /src
-import Categories from '@/components/Categories.vue';
-import MovieCard from '@/components/MovieCard.vue';
+import axios from 'axios'
+import config from '@/config.js'
+import Categories from '@/components/Categories.vue'
+import MovieCard from '@/components/MovieCard.vue'
 
 export default {
   name: 'home',
   components: {
     Categories,
-    MovieCard,
+    MovieCard
   },
-  data() {
+  data () {
     return {
       loading: true,
-      movies: [],
-    };
+      movies: []
+    }
+  },
+  created () {
+    if (localStorage.films) {
+      this.movies = JSON.parse(localStorage.films)
+      this.loading = false
+    } else {
+      this.getPopular()
+    }
   },
   methods: {
-    getMovies(data) {
-      this.movies = data;
-      this.loading = false;
+    getMovies (data) {
+      this.loading = true
+      this.movies = data
+      this.loading = false
     },
-  },
-};
+    getPopular () {
+      axios.get(`https://api.themoviedb.org/3/movie/popular?page=${this.page}&api_key=${config.api_key}`)
+        .then((response) => {
+          this.movies = response.data.results
+          this.loading = false
+        })
+        .catch(error => {
+          console.log('Error occured: ', error)
+        })
+    }
+  }
+}
 </script>
 <style lang="scss">
 body {

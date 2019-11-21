@@ -41,60 +41,72 @@
 </template>
 
 <script>
-import axios from 'axios';
-import moment from 'moment';
-import config from '../../config';
+import axios from 'axios'
+import moment from 'moment'
+import config from '@/config.js'
 
 export default {
   name: 'movieDetail',
   props: {
-    id: String,
+    id: Number
   },
-  data() {
+  data () {
     return {
       movie: [],
       media: [],
-      activeMovie: '',
-    };
+      activeMovie: ''
+    }
   },
-  created() {
-    this.getMovie();
+  created () {
+    this.getMovie()
   },
   filters: {
-    moment(date) {
-      return moment(date).format('MMMM Do, YYYY');
-    },
+    moment (date) {
+      return moment(date).format('MMMM Do, YYYY')
+    }
   },
   methods: {
-    getMovie() {
+    getMovie () {
       axios.get(`https://api.themoviedb.org/3/movie/${this.id}?api_key=${config.api_key}`)
         .then((response) => {
-          this.movie = response.data;
-          this.setRate();
-        });
+          this.movie = response.data
+          this.setRate()
+        })
+        .catch(error => {
+          console.log('Error occured: ', error)
+        })
     },
-    setRate() {
-      const rate = this.movie.vote_average;
-      const rateStick = document.querySelector('.movie-detail__rate');
-      rateStick.style.left = `${rate * 10}%`;
+    setRate () {
+      const rate = this.movie.vote_average
+      const rateStick = document.querySelector('.movie-detail__rate')
+      rateStick.style.left = `${rate * 10}%`
     },
-    showVideo() {
+    showVideo () {
       axios.get(`https://api.themoviedb.org/3/movie/${this.id}/videos?api_key=${config.api_key}`)
         .then((response) => {
-          this.media = response.data.results;
-          this.activeMovie = response.data.results[0].key;
-        });
+          this.media = response.data.results
+          this.activeMovie = response.data.results[0].key
+        })
+        .catch(error => {
+          console.log('Error occured: ', error)
+        })
     },
-    switchVideo(key, el) {
-      this.activeMovie = key;
-      const btnSwitch = document.querySelectorAll('.movie-detail__show');
+    switchVideo (key, el) {
+      this.activeMovie = key
+      const btnSwitch = document.querySelectorAll('.movie-detail__show')
+      const sectionScroll = document.querySelector('.movie-detail').offsetHeight
       btnSwitch.forEach((btn) => {
-        btn.classList.remove('active');
-      });
-      el.target.classList.add('active');
-    },
-  },
-};
+        btn.classList.remove('active')
+      })
+      el.target.classList.add('active')
+
+      window.scrollTo({
+        top: sectionScroll,
+        behavior: 'smooth'
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss">

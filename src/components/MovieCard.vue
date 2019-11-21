@@ -5,7 +5,7 @@
       <p class="movie-title">{{ movie.title }}</p>
       <section class="movie-date-view-wrapper">
         <p class="movie-date">{{ movie.release_date | moment }}</p>
-        <p class="movie-views">{{ movie.vote_count }}</p>
+        <p class="movie-views">Views: {{ movie.vote_count }}</p>
       </section>
       <p class="movie-overview">{{ movie.overview }}</p>
       <router-link :to="{name: 'detailMovie', params: { id: movie.id }}">Detail</router-link>
@@ -14,25 +14,25 @@
 </template>
 
 <script>
-import moment from 'moment';
+import moment from 'moment'
 
-const TRANSPARENT_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const TRANSPARENT_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
 export default {
   name: 'MovieCard',
   props: ['movie'],
   computed: {
-    imageUrl() {
-      if (this.movie.backdrop_path == null) return TRANSPARENT_GIF;
-      return `https://image.tmdb.org/t/p/w500_and_h282_bestv2${this.movie.backdrop_path}`;
-    },
+    imageUrl () {
+      if (this.movie.backdrop_path == null) return TRANSPARENT_GIF
+      return `https://image.tmdb.org/t/p/w500_and_h282_bestv2${this.movie.backdrop_path}`
+    }
   },
   filters: {
-    moment(date) {
-      return moment(date).format('MMMM Do, YYYY');
-    },
-  },
-};
+    moment (date) {
+      return moment(date).format('MMMM Do, YYYY')
+    }
+  }
+}
 </script>
 <style lang="scss">
 .movie-card {

@@ -13,86 +13,96 @@
 </template>
 
 <script>
-import axios from 'axios';
-import config from '../../config';
+import axios from 'axios'
+import config from '@/config.js'
 
 export default {
   name: 'categories',
-  data() {
+  data () {
     return {
       genres: [],
       films: [],
       page: 1,
       totalPages: null,
       scrollAllow: true,
-      activeGenre: '',
-    };
+      activeGenre: ''
+    }
   },
-  created() {
-    window.addEventListener('scroll', this.scrollFilm);
+  created () {
+    window.addEventListener('scroll', this.scrollFilm)
   },
-  mounted() {
+  mounted () {
     this.fetchGenres()
       .then((response) => {
-        this.genres = response.data.genres;
-      });
+        this.genres = response.data.genres
+      })
+      .catch(error => {
+        console.log('Error occured: ', error)
+      })
   },
   methods: {
-    fetchGenres() {
-      return axios.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=${config.api_key}`);
+    fetchGenres () {
+      return axios.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=${config.api_key}`)
     },
-    fetchPopular() {
-      return axios.get(`https://api.themoviedb.org/3/movie/popular?page=${this.page}&api_key=${config.api_key}`);
+    fetchPopular () {
+      return axios.get(`https://api.themoviedb.org/3/movie/popular?page=${this.page}&api_key=${config.api_key}`)
     },
-    searchForGenre(id) {
+    searchForGenre (id) {
       if (this.activeGenre !== id) {
-        this.films = [];
-        this.page = 1;
+        this.films = []
+        this.page = 1
       }
-      this.activeGenre = id;
-      this.getTotalPages();
+      this.activeGenre = id
+      this.getTotalPages()
       this.fetchPopular()
         .then((response) => {
           response.data.results.forEach((film) => {
             film.genre_ids.filter((filmId) => {
               if (filmId === id) {
-                this.films.push(film);
+                this.films.push(film)
               }
-              return true;
-            });
-            return this.$emit('filterFilm', this.films);
-          });
-          this.scrollAllow = true;
-        });
+              return true
+            })
+            return this.$emit('filterFilm', this.films)
+          })
+          this.scrollAllow = true
+          localStorage.films = JSON.stringify(this.films)
+        })
+        .catch(error => {
+          console.log('Error occured: ', error)
+        })
     },
-    getTotalPages() {
+    getTotalPages () {
       if (this.totalPages == null) {
         this.fetchPopular()
           .then((response) => {
-            this.totalPages = response.data.total_pages;
-          });
+            this.totalPages = response.data.total_pages
+          })
+          .catch(error => {
+            console.log('Error occured: ', error)
+          })
       }
-      return false;
+      return false
     },
-    scrollFilm() {
+    scrollFilm () {
       if (this.scrollAllow) {
-        const windowHeight = window.innerHeight + window.pageYOffset;
-        const viewPortHeight = Math.round(document.body.getBoundingClientRect().height) - 100;
+        const windowHeight = window.innerHeight + window.pageYOffset
+        const viewPortHeight = Math.round(document.body.getBoundingClientRect().height) - 100
         if (windowHeight > viewPortHeight) {
-          this.pageInc();
-          this.scrollAllow = false;
-          this.searchForGenre(this.activeGenre);
+          this.pageInc()
+          this.scrollAllow = false
+          this.searchForGenre(this.activeGenre)
         }
       }
     },
-    pageInc() {
+    pageInc () {
       if (this.page <= this.totalPages) {
-        this.page += 1;
+        this.page += 1
       }
-      return true;
-    },
-  },
-};
+      return true
+    }
+  }
+}
 </script>
 <style lang="scss">
 .genres {
